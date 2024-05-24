@@ -50,20 +50,20 @@ export class IpValidatorService {
   // Function to check is IP allowed by async task
   public async isAllowAsync(policy: any) {
     const data = await lastValueFrom(this.getIP());
-    const networkConfig: any = await lastValueFrom(this.http.get('assets/config/network.config.json'));
+    const config: any = await lastValueFrom(this.http.get('assets/config/network.policy.json'));
 
-    if (!networkConfig.hasOwnProperty('Allow')) {
+    if (!config.hasOwnProperty(policy.scheme)){
       return true;
     }
 
-    const group = networkConfig.Allow;
-    if (!group.hasOwnProperty(policy.scheme)){
+    const scheme = config[policy.scheme];
+    if (!scheme.hasOwnProperty('Allow')) {
       return true;
     }
 
-    this.whitelist = group[policy.scheme];
+    this.whitelist = scheme.Allow;
 
-    console.log('network-config', networkConfig);
+    console.log('network-policy-scheme', scheme);
     console.log('my-ip', data.ip);
     return this.isAllowed(data.ip);
   }
